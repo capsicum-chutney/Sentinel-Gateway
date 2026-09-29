@@ -3,6 +3,7 @@ package com.sentinel.sentinel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 public class GatewayController {
@@ -15,20 +16,16 @@ public class GatewayController {
         this.routeConfig = routeConfig;
     }
     
-    @GetMapping("/data")
-public String getData() {
-    return restClient.get()
-            .uri(routeConfig.getRoutes().get("/data"))
-            .retrieve()
-            .body(String.class);
-}
+    @GetMapping("/**")
+public String gateway(HttpServletRequest request) {
 
-    @GetMapping("/users")
-public String getUsers() {
+    String path = request.getRequestURI();
+    String backendUrl = routeConfig.getRoutes().get(path);
+    
 
     return restClient.get()
-            .uri(routeConfig.getRoutes().get("/users"))
-            .retrieve()
-            .body(String.class);
+        .uri(backendUrl)
+        .retrieve()
+        .body(String.class);
 }
 }
